@@ -87,7 +87,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       theme.colorScheme.surface,
                     ]
                   : [
-                      theme.colorScheme.primary.withOpacity(0.1),
+                      theme.colorScheme.primary.withValues(alpha:0.1),
                       theme.colorScheme.surface,
                     ],
             ),
@@ -147,7 +147,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
       width: logoSize,
       height: logoSize,
       decoration: BoxDecoration(
-        color: theme.colorScheme.primary.withOpacity(0.1),
+        color: theme.colorScheme.primary.withValues(alpha: 0.1),
         shape: BoxShape.circle,
       ),
       child: Stack(
@@ -166,7 +166,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: theme.colorScheme.primary.withOpacity(0.3 * value),
+                      color: theme.colorScheme.primary.withValues(alpha: 0.3),
                       width: 2,
                     ),
                   ),
