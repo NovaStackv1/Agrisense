@@ -104,7 +104,6 @@ class LoginViewModel extends ChangeNotifier {
     _isLoading = false;
     _errorMessage = null;
     _isNewUser = false;
-    // Don't call notifyListeners() here to avoid rebuilding after dispose
   }
 
   // Check if user is already logged in

@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 
 // Core
+import 'core/navigation/main_navigation.dart';
 import 'core/services/auth_service.dart';
 import 'core/theme/app_theme.dart';
 
@@ -57,7 +58,7 @@ class MyApp extends StatelessWidget {
             // Theme configuration
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
-            themeMode: ThemeMode.system, // Follows system theme
+            themeMode: ThemeMode.system,
             
             // Routes
             initialRoute: '/',
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
               '/': (context) => const SplashScreen(),
               '/login': (context) => const LoginScreen(),
               '/home': (context) => const HomeScreen(),
+              '/navigation': (context) => const MainNavigation(),
             },
             
             // Unknown route handler

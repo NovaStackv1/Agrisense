@@ -12,13 +12,88 @@ class HomeScreen extends StatelessWidget {
     final authService = Provider.of<AuthService>(context, listen: false);
     final user = authService.currentUser;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Agrisense AI'),
+        title: const Text('Agrisense'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => _handleSignOut(context),
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: (String value) {
+              _handleMenuSelection(context, value, authService);
+            },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              PopupMenuItem<String>(
+                value: 'settings',
+
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.settings,
+                      size: 20,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
+                    SizedBox(width: 8),
+                    Text('Settings'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'account',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.person,
+                      size: 20,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
+                    SizedBox(width: 8),
+                    Text('Account'),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem<String>(
+                value: 'help',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.help_outline,
+                      size: 20,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
+                    SizedBox(width: 8),
+                    Text('Help & Support'),
+                  ],
+                ),
+              ),
+              PopupMenuItem<String>(
+                value: 'about',
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.info_outline,
+                      size: 20,
+                      color: isDark ? Colors.white70 : Colors.black87,
+                    ),
+                    SizedBox(width: 8),
+                    Text('About'),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              PopupMenuItem<String>(
+                value: 'logout',
+                child: Row(
+                  children: [
+                    Icon(Icons.logout, size: 20, color: Colors.red),
+                    SizedBox(width: 8),
+                    Text('Logout', style: TextStyle(color: Colors.red)),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
@@ -34,7 +109,7 @@ class HomeScreen extends StatelessWidget {
                 gradient: LinearGradient(
                   colors: [
                     theme.colorScheme.primary,
-                    theme.colorScheme.primary.withOpacity(0.7),
+                    theme.colorScheme.primary.withValues(alpha: 0.7),
                   ],
                 ),
                 borderRadius: BorderRadius.circular(16),
@@ -50,36 +125,28 @@ class HomeScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    user?.displayName ?? 'Farmer',
+                    (user?.displayName != null && user!.displayName!.isNotEmpty)
+                        ? user.displayName!.split(' ').first
+                        : 'Farmer',
                     style: theme.textTheme.titleLarge?.copyWith(
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    user?.email ?? '',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: Colors.white.withOpacity(0.9),
-                    ),
-                  ),
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 24),
-            
+
             // Feature cards
-            Text(
-              'Features',
-              style: theme.textTheme.headlineSmall,
-            ),
+            Text('Features', style: theme.textTheme.headlineSmall),
             const SizedBox(height: 16),
-            
+
             GridView.count(
               crossAxisCount: 2,
               shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
+              physics: AlwaysScrollableScrollPhysics(),
               mainAxisSpacing: 16,
               crossAxisSpacing: 16,
               children: [
@@ -119,6 +186,82 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  void _handleMenuSelection(
+    BuildContext context,
+    String value,
+    AuthService authService,
+  ) {
+    switch (value) {
+      case 'settings':
+        // Navigate to settings screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Settings - Coming soon!'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        break;
+      case 'account':
+        // Navigate to account screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Account - Coming soon!'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        break;
+      case 'help':
+        // Navigate to help screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Help & Support - Coming soon!'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        break;
+      case 'about':
+        // Navigate to about screen
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('About - Coming soon!'),
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+        break;
+      case 'logout':
+        _showLogoutDialog(context, authService);
+        break;
+    }
+  }
+
+  void _showLogoutDialog(BuildContext context, AuthService authService) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Logout'),
+          content: Text('Are you sure you want to logout?'),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: Text('Cancel'),
+            ),
+            TextButton(
+              onPressed: () async {
+                Navigator.of(context).pop();
+                await authService.signOut();
+                Navigator.of(context).pushReplacementNamed('/login');
+              },
+              child: Text('Logout', style: TextStyle(color: Colors.red)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   Widget _buildFeatureCard(
     BuildContext context,
     String title,
@@ -139,23 +282,19 @@ class HomeScreen extends StatelessWidget {
         },
         borderRadius: BorderRadius.circular(16),
         child: Container(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Container(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  icon,
-                  size: 32,
-                  color: theme.colorScheme.primary,
-                ),
+                child: Icon(icon, size: 32, color: theme.colorScheme.primary),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 9),
               Text(
                 title,
                 style: theme.textTheme.titleMedium?.copyWith(
@@ -163,7 +302,7 @@ class HomeScreen extends StatelessWidget {
                 ),
                 textAlign: TextAlign.center,
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: 3),
               Text(
                 subtitle,
                 style: theme.textTheme.bodySmall,
@@ -174,33 +313,5 @@ class HomeScreen extends StatelessWidget {
         ),
       ),
     );
-  }
-
-  Future<void> _handleSignOut(BuildContext context) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Sign Out'),
-        content: const Text('Are you sure you want to sign out?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Sign Out'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true && context.mounted) {
-      final authService = Provider.of<AuthService>(context, listen: false);
-      await authService.signOut();
-      if (context.mounted) {
-        Navigator.pushReplacementNamed(context, '/login');
-      }
-    }
   }
 }
