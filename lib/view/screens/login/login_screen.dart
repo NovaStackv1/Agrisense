@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../../core/navigation/main_navigation.dart';
 import '../../../viewmodel/login_viewmodel.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -57,7 +58,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
 
   void _navigateToHome() {
     if (mounted) {
-      Navigator.pushReplacementNamed(context, '/home');
+      Navigator.pushReplacement(context, 
+        MaterialPageRoute(
+          builder: (context) => const MainNavigation(),
+        ),
+      );
     }
   }
 
@@ -70,10 +75,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
   Future<void> _handleGoogleSignIn() async {
     final viewModel = Provider.of<LoginViewModel>(context, listen: false);
     
-    // Start the sign-in process - navigation will be handled by auth state listener
     await viewModel.signInWithGoogle();
     
-    // Don't navigate immediately here - let the auth state listener handle it
   }
 
   @override
@@ -99,10 +102,8 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                     child: IntrinsicHeight(
                       child: Column(
                         children: [
-                          // Top agriculture image section
                           _buildHeaderImage(size, theme, isDark),
                           
-                          // Content section
                           Expanded(
                             child: _buildContentSection(size, theme),
                           ),
@@ -131,18 +132,17 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           end: Alignment.bottomCenter,
           colors: isDark
               ? [
-                  theme.colorScheme.primary.withOpacity(0.3),
+                  theme.colorScheme.primary.withValues(alpha: 0.3),
                   theme.colorScheme.surface,
                 ]
               : [
                   theme.colorScheme.primary,
-                  theme.colorScheme.primary.withOpacity(0.7),
+                  theme.colorScheme.primary.withValues(alpha:0.7),
                 ],
         ),
       ),
       child: Stack(
         children: [
-          // Decorative circles
           Positioned(
             top: -50,
             right: -50,
@@ -189,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                 Icon(
                   Icons.eco,
                   size: size.width * 0.1,
-                  color: Colors.white.withOpacity(0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                 ),
               ],
             ),
@@ -233,11 +233,11 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
                   vertical: 12,
                 ),
                 decoration: BoxDecoration(
-                  color: theme.colorScheme.primary.withOpacity(0.1),
+                  color: theme.colorScheme.primary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Text(
-                  '🌱 Detect diseases  •  📊 Track expenses  •  🌤️ Weather insights',
+                  '🌱 Detect diseases  •  📊 Track expenses  •  🌤️ Weather  •  Market insights',
                   style: theme.textTheme.bodyMedium?.copyWith(
                     fontSize: size.width * 0.03,
                   ),
@@ -332,7 +332,7 @@ class _LoginScreenState extends State<LoginScreen> with SingleTickerProviderStat
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
+              color: Colors.black.withValues(alpha: 0.1),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
