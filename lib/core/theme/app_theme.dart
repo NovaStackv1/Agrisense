@@ -19,7 +19,7 @@ class AppTheme {
       secondary: accentGreen,
       tertiary: leafGreen,
       surface: Colors.white,
-      background: const Color(0xFFF5F5F5),
+      surfaceContainerLowest: const Color(0xFFF5F5F5),
     ),
     
     // AppBar Theme
@@ -113,7 +113,7 @@ class AppTheme {
       secondary: accentGreen,
       tertiary: leafGreen,
       surface: const Color(0xFF1E1E1E),
-      background: const Color(0xFF121212),
+      surfaceContainerLowest: const Color(0xFF121212),
     ),
     
     // AppBar Theme
