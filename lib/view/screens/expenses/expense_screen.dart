@@ -148,12 +148,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             ElevatedButton(
               onPressed: () {
                 Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Data exported successfully!'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
+                _showToast('Export feature coming soon!');
               },
               child: const Text('Export'),
             ),
@@ -218,6 +213,10 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
   }
 
   void _showAddTransactionDialog() {
+    final TextEditingController descriptionController = TextEditingController();
+    final TextEditingController amountController = TextEditingController();
+    String selectedCategory = _isExpenseTab ? 'Seeds' : 'Crop Sales';
+
     String transactionType = _isExpenseTab ? 'Expense' : 'Income';
 
     showDialog(
@@ -230,6 +229,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               TextField(
+                controller: descriptionController,
                 decoration: InputDecoration(
                   labelText: 'Description',
                   border: OutlineInputBorder(
@@ -239,6 +239,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               ),
               const SizedBox(height: 12),
               TextField(
+                controller: amountController,
                 decoration: InputDecoration(
                   labelText: 'Amount',
                   border: OutlineInputBorder(
@@ -250,6 +251,7 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
               ),
               const SizedBox(height: 12),
               DropdownButtonFormField<String>(
+                value: selectedCategory,
                 decoration: InputDecoration(
                   labelText: 'Category',
                   border: OutlineInputBorder(
@@ -269,7 +271,11 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                   child: Text(category),
                 ))
                     .toList(),
-                onChanged: (value) {},
+                onChanged: (value) {
+                  if (value != null) {
+                    selectedCategory = value;
+                  }
+                },
               ),
             ],
           ),
@@ -280,13 +286,26 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
             ),
             ElevatedButton(
               onPressed: () {
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('$transactionType added successfully!'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
+                if (descriptionController.text.isEmpty || amountController.text.isEmpty) {
+                  _showToast('Please fill all fields');
+                  return;
+                }
+
+                final double amount = double.tryParse(amountController.text) ?? 0;
+                if (amount <= 0) {
+                  _showToast('Please enter a valid amount');
+                  return;
+                }
+
+                _addTransaction(
+                  description: descriptionController.text,
+                  amount: amount,
+                  category: selectedCategory,
+                  type: _isExpenseTab ? 'expense' : 'income',
                 );
+
+                Navigator.of(context).pop();
+                _showToast('$transactionType added successfully!');
               },
               child: Text('Add $transactionType'),
             ),
@@ -294,6 +313,89 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
         );
       },
     );
+  }
+
+  void _addTransaction({
+    required String description,
+    required double amount,
+    required String category,
+    required String type,
+  }) {
+    final Map<String, dynamic> newTransaction = {
+      'title': description,
+      'category': category,
+      'amount': '${type == 'expense' ? '-' : '+'}Ksh ${amount.toStringAsFixed(0)}',
+      'date': 'Just now',
+      'icon': _getIconForCategory(category, type),
+      'color': _getColorForCategory(category),
+      'type': type,
+    };
+
+    setState(() {
+      _allTransactions.insert(0, newTransaction);
+    });
+  }
+
+  IconData _getIconForCategory(String category, String type) {
+    if (type == 'income') {
+      return Icons.shopping_cart;
+    }
+
+    switch (category) {
+      case 'Seeds':
+        return Icons.spa;
+      case 'Fertilizers':
+        return Icons.agriculture;
+      case 'Labor':
+        return Icons.people;
+      case 'Equipment':
+        return Icons.build;
+      case 'Inputs':
+        return Icons.agriculture;
+      case 'Maintenance':
+        return Icons.build;
+      default:
+        return Icons.receipt;
+    }
+  }
+
+  Color _getColorForCategory(String category) {
+    switch (category) {
+      case 'Seeds':
+        return Colors.green;
+      case 'Fertilizers':
+        return Colors.orange;
+      case 'Labor':
+        return Colors.purple;
+      case 'Equipment':
+        return Colors.red;
+      case 'Inputs':
+        return Colors.orange;
+      case 'Maintenance':
+        return Colors.red;
+      case 'Crop Sales':
+        return Colors.blue;
+      case 'Livestock':
+        return Colors.brown;
+      case 'Produce':
+        return Colors.green;
+      default:
+        return Colors.grey;
+    }
+  }
+
+  void _showToast(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _showViewAllToast() {
+    _showToast('View All feature coming soon!');
   }
 
   @override
@@ -430,11 +532,14 @@ class _ExpenseScreenState extends State<ExpenseScreen> {
                           'Recent ${_isExpenseTab ? 'Expenses' : 'Income'}',
                           style: theme.textTheme.headlineSmall,
                         ),
-                        Text(
-                          'View All',
-                          style: theme.textTheme.bodyMedium?.copyWith(
-                            color: theme.colorScheme.primary,
-                            fontWeight: FontWeight.w600,
+                        GestureDetector(
+                          onTap: _showViewAllToast,
+                          child: Text(
+                            'View All',
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: theme.colorScheme.primary,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
