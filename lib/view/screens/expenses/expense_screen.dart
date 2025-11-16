@@ -1,7 +1,300 @@
 import 'package:flutter/material.dart';
 
-class ExpenseScreen extends StatelessWidget {
+class ExpenseScreen extends StatefulWidget {
   const ExpenseScreen({super.key});
+
+  @override
+  State<ExpenseScreen> createState() => _ExpenseScreenState();
+}
+
+class _ExpenseScreenState extends State<ExpenseScreen> {
+  bool _isExpenseTab = true;
+  final List<Map<String, dynamic>> _allTransactions = [
+    {
+      'title': 'Fertilizers',
+      'category': 'Inputs',
+      'amount': '-Ksh 2,500',
+      'date': 'Today',
+      'icon': Icons.agriculture,
+      'color': Colors.orange,
+      'type': 'expense',
+    },
+    {
+      'title': 'Seed Purchase',
+      'category': 'Seeds',
+      'amount': '-Ksh 1,800',
+      'date': 'Yesterday',
+      'icon': Icons.spa,
+      'color': Colors.green,
+      'type': 'expense',
+    },
+    {
+      'title': 'Tomato Sale',
+      'category': 'Sales',
+      'amount': '+Ksh 8,200',
+      'date': '2 days ago',
+      'icon': Icons.shopping_cart,
+      'color': Colors.blue,
+      'type': 'income',
+    },
+    {
+      'title': 'Labor Cost',
+      'category': 'Labor',
+      'amount': '-Ksh 3,500',
+      'date': '3 days ago',
+      'icon': Icons.people,
+      'color': Colors.purple,
+      'type': 'expense',
+    },
+    {
+      'title': 'Equipment Repair',
+      'category': 'Maintenance',
+      'amount': '-Ksh 2,833',
+      'date': '1 week ago',
+      'icon': Icons.build,
+      'color': Colors.red,
+      'type': 'expense',
+    },
+    {
+      'title': 'Maize Harvest',
+      'category': 'Sales',
+      'amount': '+Ksh 12,000',
+      'date': '3 days ago',
+      'icon': Icons.shopping_cart,
+      'color': Colors.blue,
+      'type': 'income',
+    },
+    {
+      'title': 'Pesticides',
+      'category': 'Inputs',
+      'amount': '-Ksh 1,200',
+      'date': '4 days ago',
+      'icon': Icons.medical_services,
+      'color': Colors.orange,
+      'type': 'expense',
+    },
+  ];
+
+  List<Map<String, dynamic>> get _filteredTransactions {
+    return _allTransactions
+        .where((transaction) => _isExpenseTab
+        ? transaction['type'] == 'expense'
+        : transaction['type'] == 'income')
+        .toList();
+  }
+
+  double get _totalIncome {
+    return _allTransactions
+        .where((transaction) => transaction['type'] == 'income')
+        .fold(0.0, (sum, transaction) {
+      final amount = double.parse(transaction['amount']
+          .toString()
+          .replaceAll('+Ksh ', '')
+          .replaceAll(',', ''));
+      return sum + amount;
+    });
+  }
+
+  double get _totalExpenses {
+    return _allTransactions
+        .where((transaction) => transaction['type'] == 'expense')
+        .fold(0.0, (sum, transaction) {
+      final amount = double.parse(transaction['amount']
+          .toString()
+          .replaceAll('-Ksh ', '')
+          .replaceAll(',', ''));
+      return sum + amount;
+    });
+  }
+
+  double get _totalBalance => _totalIncome - _totalExpenses;
+
+  String _formatCurrency(double amount) {
+    return 'Ksh ${amount.toStringAsFixed(0).replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (Match m) => '${m[1]},',
+    )}';
+  }
+
+  void _handleMenuSelection(String value) {
+    switch (value) {
+      case 'export':
+        _showExportDialog();
+        break;
+      case 'categories':
+        _showCategoriesDialog();
+        break;
+      case 'reports':
+        _showReportsDialog();
+        break;
+      case 'settings':
+        _showSettingsDialog();
+        break;
+    }
+  }
+
+  void _showExportDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Export Data'),
+          content: const Text('Export your transaction data as CSV or PDF.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Data exported successfully!'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+              child: const Text('Export'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showCategoriesDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Manage Categories'),
+          content: const Text('Add, edit, or delete transaction categories.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showReportsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Financial Reports'),
+          content: const Text('View detailed financial reports and analytics.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Expense Settings'),
+          content: const Text('Configure your expense tracking preferences.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Close'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showAddTransactionDialog() {
+    String transactionType = _isExpenseTab ? 'Expense' : 'Income';
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Add $transactionType',
+              style: Theme.of(context).textTheme.headlineSmall),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Description',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 12),
+              TextField(
+                decoration: InputDecoration(
+                  labelText: 'Amount',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  prefixText: 'Ksh ',
+                ),
+                keyboardType: TextInputType.number,
+              ),
+              const SizedBox(height: 12),
+              DropdownButtonFormField<String>(
+                decoration: InputDecoration(
+                  labelText: 'Category',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                items: _isExpenseTab
+                    ? ['Seeds', 'Fertilizers', 'Labor', 'Equipment', 'Other']
+                    .map((category) => DropdownMenuItem<String>(
+                  value: category,
+                  child: Text(category),
+                ))
+                    .toList()
+                    : ['Crop Sales', 'Livestock', 'Produce', 'Other']
+                    .map((category) => DropdownMenuItem<String>(
+                  value: category,
+                  child: Text(category),
+                ))
+                    .toList(),
+                onChanged: (value) {},
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cancel'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('$transactionType added successfully!'),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              },
+              child: Text('Add $transactionType'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,6 +306,55 @@ class ExpenseScreen extends StatelessWidget {
         title: const Text('Expense Tracker'),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: Colors.white,
+        actions: [
+          PopupMenuButton<String>(
+            icon: const Icon(Icons.more_vert),
+            onSelected: _handleMenuSelection,
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'export',
+                child: Row(
+                  children: [
+                    Icon(Icons.download, size: 20),
+                    SizedBox(width: 8),
+                    Text('Export Data'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'categories',
+                child: Row(
+                  children: [
+                    Icon(Icons.category, size: 20),
+                    SizedBox(width: 8),
+                    Text('Categories'),
+                  ],
+                ),
+              ),
+              const PopupMenuItem<String>(
+                value: 'reports',
+                child: Row(
+                  children: [
+                    Icon(Icons.analytics, size: 20),
+                    SizedBox(width: 8),
+                    Text('Reports'),
+                  ],
+                ),
+              ),
+              const PopupMenuDivider(),
+              const PopupMenuItem<String>(
+                value: 'settings',
+                child: Row(
+                  children: [
+                    Icon(Icons.settings, size: 20),
+                    SizedBox(width: 8),
+                    Text('Settings'),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
       body: Column(
         children: [
@@ -25,11 +367,48 @@ class ExpenseScreen extends StatelessWidget {
             child: Row(
               children: [
                 Expanded(
-                  child: _buildTabButton(theme, 'Expenses', true),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isExpenseTab = true;
+                      });
+                    },
+                    child: _buildTabButton(theme, 'Expenses', _isExpenseTab),
+                  ),
                 ),
                 const SizedBox(width: 8),
                 Expanded(
-                  child: _buildTabButton(theme, 'Income', false),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _isExpenseTab = false;
+                      });
+                    },
+                    child: _buildTabButton(theme, 'Income', !_isExpenseTab),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Transaction Count
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  '${_filteredTransactions.length} ${_isExpenseTab ? 'Expenses' : 'Income Sources'}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: isDark ? Colors.white70 : Colors.black54,
+                  ),
+                ),
+                Text(
+                  'Total: ${_isExpenseTab ? _formatCurrency(_totalExpenses) : _formatCurrency(_totalIncome)}',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: _isExpenseTab ? Colors.red : Colors.green,
+                  ),
                 ),
               ],
             ),
@@ -43,12 +422,12 @@ class ExpenseScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    padding: const EdgeInsets.symmetric(vertical: 8),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          'Recent Transactions',
+                          'Recent ${_isExpenseTab ? 'Expenses' : 'Income'}',
                           style: theme.textTheme.headlineSmall,
                         ),
                         Text(
@@ -71,12 +450,10 @@ class ExpenseScreen extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          _showAddExpenseDialog(context);
-        },
+        onPressed: _showAddTransactionDialog,
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: Colors.white,
-        child: const Icon(Icons.add),
+        child: Icon(_isExpenseTab ? Icons.remove : Icons.add),
       ),
     );
   }
@@ -106,7 +483,7 @@ class ExpenseScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            'Ksh 24,567', // <-- Changed here
+            _formatCurrency(_totalBalance),
             style: theme.textTheme.displayMedium?.copyWith(
               color: Colors.white,
               fontWeight: FontWeight.bold,
@@ -116,10 +493,8 @@ class ExpenseScreen extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
-              _buildBalanceItem(
-                  'Income', 'Ksh 35,200', Colors.green[300]!), // <-- Changed here
-              _buildBalanceItem('Expenses', 'Ksh 10,633',
-                  Colors.red[300]!), // <-- Changed here
+              _buildBalanceItem('Income', _formatCurrency(_totalIncome), Colors.green[300]!),
+              _buildBalanceItem('Expenses', _formatCurrency(_totalExpenses), Colors.red[300]!),
             ],
           ),
         ],
@@ -172,50 +547,39 @@ class ExpenseScreen extends StatelessWidget {
   }
 
   Widget _buildTransactionList(ThemeData theme, bool isDark) {
-    // --- Data Changed Here ---
-    final List<Map<String, dynamic>> transactions = [
-      {
-        'title': 'Fertilizers',
-        'category': 'Inputs',
-        'amount': '-Ksh 2,500', // Changed
-        'date': 'Today',
-        'icon': Icons.agriculture,
-        'color': Colors.orange,
-      },
-      {
-        'title': 'Seed Purchase',
-        'category': 'Seeds',
-        'amount': '-Ksh 1,800', // Changed
-        'date': 'Yesterday',
-        'icon': Icons.spa,
-        'color': Colors.green,
-      },
-      {
-        'title': 'Tomato Sale',
-        'category': 'Sales',
-        'amount': '+Ksh 8,200', // Changed
-        'date': '2 days ago',
-        'icon': Icons.shopping_cart,
-        'color': Colors.blue,
-      },
-      {
-        'title': 'Labor Cost',
-        'category': 'Labor',
-        'amount': '-Ksh 3,500', // Changed
-        'date': '3 days ago',
-        'icon': Icons.people,
-        'color': Colors.purple,
-      },
-      {
-        'title': 'Equipment Repair',
-        'category': 'Maintenance',
-        'amount': '-Ksh 2,833', // Changed
-        'date': '1 week ago',
-        'icon': Icons.build,
-        'color': Colors.red,
-      },
-    ];
-    // --- End of Data Changes ---
+    final transactions = _filteredTransactions;
+
+    if (transactions.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              _isExpenseTab ? Icons.money_off : Icons.attach_money,
+              size: 64,
+              color: Colors.grey[400],
+            ),
+            const SizedBox(height: 16),
+            Text(
+              _isExpenseTab ? 'No expenses yet' : 'No income yet',
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: Colors.grey[600],
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              _isExpenseTab
+                  ? 'Add your first expense to get started'
+                  : 'Add your first income source to get started',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: Colors.grey[500],
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
+      );
+    }
 
     return ListView.builder(
       itemCount: transactions.length,
@@ -268,76 +632,6 @@ class ExpenseScreen extends StatelessWidget {
               ],
             ),
           ),
-        );
-      },
-    );
-  }
-
-  void _showAddExpenseDialog(BuildContext context) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Add Transaction',
-              style: Theme.of(context).textTheme.headlineSmall),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Description',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 12),
-              TextField(
-                decoration: InputDecoration(
-                  labelText: 'Amount',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  prefixText: 'Ksh ', // <-- Changed here
-                ),
-                keyboardType: TextInputType.number,
-              ),
-              const SizedBox(height: 12),
-              DropdownButtonFormField<String>(
-                decoration: InputDecoration(
-                  labelText: 'Category',
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                ),
-                items: ['Seeds', 'Fertilizers', 'Labor', 'Equipment', 'Other']
-                    .map((category) => DropdownMenuItem<String>(
-                  value: category,
-                  child: Text(category),
-                ))
-                    .toList(),
-                onChanged: (value) {},
-              ),
-            ],
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('Transaction added successfully!'),
-                    behavior: SnackBarBehavior.floating,
-                  ),
-                );
-              },
-              child: const Text('Add'),
-            ),
-          ],
         );
       },
     );
