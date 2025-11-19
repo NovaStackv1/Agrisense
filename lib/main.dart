@@ -1,3 +1,4 @@
+import 'package:agrisense/viewmodel/detection_viewmodel.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +6,7 @@ import 'package:provider/provider.dart';
 // Core
 import 'core/navigation/main_navigation.dart';
 import 'core/services/auth_service.dart';
+import 'core/services/mock_detection_service.dart';
 import 'core/theme/app_theme.dart';
 
 // ViewModels
@@ -18,10 +20,10 @@ import 'view/screens/home/home_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase
   await Firebase.initializeApp();
-  
+
   runApp(const MyApp());
 }
 
@@ -33,20 +35,19 @@ class MyApp extends StatelessWidget {
     return MultiProvider(
       providers: [
         // Services
-        Provider<AuthService>(
-          create: (_) => AuthService(),
-        ),
-        
+        Provider<AuthService>(create: (_) => AuthService()),
+        // Mock detection service
+        Provider<MockDetectionService>(create: (_) => MockDetectionService()),
+
         // ViewModels
         ChangeNotifierProvider<SplashViewModel>(
-          create: (context) => SplashViewModel(
-            context.read<AuthService>(),
-          ),
+          create: (context) => SplashViewModel(context.read<AuthService>()),
         ),
         ChangeNotifierProvider<LoginViewModel>(
-          create: (context) => LoginViewModel(
-            context.read<AuthService>(),
-          ),
+          create: (context) => LoginViewModel(context.read<AuthService>()),
+        ),
+        ChangeNotifierProvider<DetectionViewModel>(create: (context)=>
+          DetectionViewModel(context.read<MockDetectionService>()),
         ),
       ],
       child: Consumer<SplashViewModel>(
@@ -54,12 +55,12 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: 'Agrisense AI',
             debugShowCheckedModeBanner: false,
-            
+
             // Theme configuration
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,
             themeMode: ThemeMode.system,
-            
+
             // Routes
             initialRoute: '/',
             routes: {
@@ -68,7 +69,7 @@ class MyApp extends StatelessWidget {
               '/home': (context) => const HomeScreen(),
               '/navigation': (context) => const MainNavigation(),
             },
-            
+
             // Unknown route handler
             onUnknownRoute: (settings) {
               return MaterialPageRoute(
@@ -81,4 +82,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-
