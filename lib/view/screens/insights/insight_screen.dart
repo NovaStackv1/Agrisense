@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../core/theme/app_theme.dart';
 
 class InsightScreen extends StatelessWidget {
   const InsightScreen({super.key});
@@ -19,8 +20,12 @@ class InsightScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Overview Card
-            _buildOverviewCard(theme),
+            // Market Insights Card
+            _buildMarketInsightsCard(theme, isDark),
+            const SizedBox(height: 16),
+
+            // Weather Insights Card
+            _buildWeatherInsightsCard(theme, isDark),
             const SizedBox(height: 20),
 
             // Quick Stats
@@ -45,20 +50,30 @@ class InsightScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildOverviewCard(ThemeData theme) {
+  Widget _buildMarketInsightsCard(ThemeData theme, bool isDark) {
+    final marketPrimary = AppTheme.marketPrimary(isDark);
+    final marketSecondary = AppTheme.marketSecondary(isDark);
+    
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
           colors: [
-            theme.colorScheme.primary,
-            theme.colorScheme.primary.withValues(alpha: 0.8),
+            marketPrimary,
+            marketSecondary,
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: marketPrimary.withOpacity(isDark ? 0.4 : 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -66,37 +81,210 @@ class InsightScreen extends StatelessWidget {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(8),
+                padding: const EdgeInsets.all(10),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.2),
-                  shape: BoxShape.circle,
+                  color: Colors.white.withOpacity(0.25),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.insights, color: Colors.white, size: 24),
+                child: const Icon(Icons.trending_up_rounded, color: Colors.white, size: 24),
               ),
               const SizedBox(width: 12),
               Text(
-                'Farm Health Overview',
-                style: theme.textTheme.headlineSmall?.copyWith(
+                'Market Insights 📈',
+                style: theme.textTheme.titleLarge?.copyWith(
                   color: Colors.white,
-                  fontWeight: FontWeight.w600,
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
-          Text(
-            'Your crops are 85% healthy!',
-            style: theme.textTheme.titleLarge?.copyWith(
-              color: Colors.white,
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Column(
+              children: [
+                _buildMarketItem('🍅 Tomatoes', '+12%', Colors.greenAccent),
+                const SizedBox(height: 8),
+                _buildMarketItem('🌽 Corn', '+5%', Colors.greenAccent),
+                const SizedBox(height: 8),
+                _buildMarketItem('🥔 Potatoes', '-3%', Colors.redAccent.shade100),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              Icon(Icons.lightbulb_outline, color: Colors.white.withOpacity(0.9), size: 16),
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'Best time to sell tomatoes this week!',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: Colors.white.withOpacity(0.95),
+                    fontStyle: FontStyle.italic,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMarketItem(String crop, String change, Color changeColor) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          crop,
+          style: const TextStyle(
+            color: Colors.white,
+            fontSize: 15,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+          decoration: BoxDecoration(
+            color: changeColor.withOpacity(0.3),
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: Text(
+            change,
+            style: TextStyle(
+              color: changeColor,
+              fontSize: 13,
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 8),
-          Text(
-            'Based on recent analysis, most plants show good growth patterns.',
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: Colors.white.withValues(alpha: 0.9),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildWeatherInsightsCard(ThemeData theme, bool isDark) {
+    final weatherPrimary = AppTheme.weatherPrimary(isDark);
+    final weatherSecondary = AppTheme.weatherSecondary(isDark);
+    
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            weatherPrimary,
+            weatherSecondary,
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: weatherPrimary.withOpacity(isDark ? 0.4 : 0.3),
+            blurRadius: 12,
+            offset: const Offset(0, 6),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.25),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.wb_sunny_rounded, color: Colors.white, size: 24),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                'Weather Insights ☀️',
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Row(
+            children: [
+              Expanded(
+                child: _buildWeatherInfoBox('🌡️', '28°C', 'Temperature'),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildWeatherInfoBox('💧', '65%', 'Humidity'),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _buildWeatherInfoBox('🌧️', '20%', 'Rain Chance'),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: Row(
+              children: [
+                const Text('🌱', style: TextStyle(fontSize: 20)),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: Text(
+                    'Perfect conditions for planting today!',
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: Colors.white,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeatherInfoBox(String emoji, String value, String label) {
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 8),
+      decoration: BoxDecoration(
+        color: Colors.white.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Column(
+        children: [
+          Text(emoji, style: const TextStyle(fontSize: 20)),
+          const SizedBox(height: 4),
+          Text(
+            value,
+            style: const TextStyle(
+              color: Colors.white,
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.8),
+              fontSize: 11,
+            ),
+            textAlign: TextAlign.center,
           ),
         ],
       ),
@@ -160,7 +348,7 @@ class InsightScreen extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: color.withValues(alpha: 0.1),
+                color: color.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: color, size: 20),
@@ -229,7 +417,7 @@ class InsightScreen extends StatelessWidget {
             leading: Container(
               padding: const EdgeInsets.all(8),
               decoration: BoxDecoration(
-                color: statusColor.withValues(alpha: 0.1),
+                color: statusColor.withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Icon(statusIcon, color: statusColor, size: 20),
