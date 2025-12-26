@@ -480,7 +480,7 @@ class InsightScreen extends StatelessWidget {
               Icons.medical_services,
             ),
             _buildRecommendationItem(
-              'Increase spacing between potato plants for better air flow',
+              '4Increase spacing between potato plants for better air flow',
               Icons.agriculture,
             ),
             _buildRecommendationItem(
