@@ -8,6 +8,28 @@ class AppTheme {
   static const Color accentGreen = Color(0xFF4CAF50);
   static const Color leafGreen = Color(0xFF8BC34A);
   
+  // Market Insights colors (light mode)
+  static const Color marketPrimaryLight = Color(0xFF43A047);
+  static const Color marketSecondaryLight = Color(0xFF66BB6A);
+  
+  // Market Insights colors (dark mode) - softer, muted greens
+  static const Color marketPrimaryDark = Color(0xFF2E7D32);
+  static const Color marketSecondaryDark = Color(0xFF4CAF50);
+  
+  // Weather Insights colors (light mode)
+  static const Color weatherPrimaryLight = Color(0xFF42A5F5);
+  static const Color weatherSecondaryLight = Color(0xFF64B5F6);
+  
+  // Weather Insights colors (dark mode) - deeper, muted blues
+  static const Color weatherPrimaryDark = Color(0xFF1976D2);
+  static const Color weatherSecondaryDark = Color(0xFF42A5F5);
+  
+  // Helper methods to get theme-aware colors
+  static Color marketPrimary(bool isDark) => isDark ? marketPrimaryDark : marketPrimaryLight;
+  static Color marketSecondary(bool isDark) => isDark ? marketSecondaryDark : marketSecondaryLight;
+  static Color weatherPrimary(bool isDark) => isDark ? weatherPrimaryDark : weatherPrimaryLight;
+  static Color weatherSecondary(bool isDark) => isDark ? weatherSecondaryDark : weatherSecondaryLight;
+  
   // Light Theme
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
